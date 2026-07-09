@@ -68,7 +68,7 @@ src/sinan/
 - ✅ 用枚举成员: `NodeType.CODE_SYMBOL`、`EdgeType.CALLS`
 - ❌ 禁止在 types.py 之外定义 `NodeType`/`EdgeType`(StrEnum 子类) — `test_node_edge_types_defined_only_in_core` 强制
 - ❌ 禁止用裸字符串构造类型: `"CodeSymbol"`（拼写错误不会被捕获）— 用枚举成员
-- ❌ 禁止添加枚举成员而不更新 `NODE_TYPE_REGISTRY`/`EDGE_TYPE_REGISTRY` — `test_all_types_registered` 强制
+- ❌ 禁止添加枚举成员而不更新 `NODE_TYPE_REGISTRY`/`EDGE_TYPE_REGISTRY` — `test_all_node_types_registered` / `test_all_edge_types_registered` 强制
 
 ## 铁律 #2: 节点/边类型形状（ADR-0006, ADR-0020）
 

@@ -4,7 +4,9 @@ This module is the ONLY place where NodeType and EdgeType may be defined.
 Packs must use ``NodeType.CODE_SYMBOL`` / ``EdgeType.CALLS`` members, never raw
 strings. The architecture-gate test ``test_node_edge_types_defined_only_in_core``
 enforces that no StrEnum subclass named NodeType/EdgeType exists outside this
-file. See ADR-0006 (data model) and ADR-0020 (governance).
+file, and ``test_all_node_types_registered`` / ``test_all_edge_types_registered``
+assert every member appears in its registry. See ADR-0006 (data model) and
+ADR-0020 (governance).
 
 Slash-variant names in ADR-0006 are resolved here with rationale:
 - MODULE covers "Module/Package" — same graph role (namespace layer); the

@@ -56,9 +56,10 @@ def test_node_edge_types_defined_only_in_core() -> None:
             if not isinstance(node, ast.ClassDef):
                 continue
             if node.name in ("NodeType", "EdgeType"):
-                # Is it a StrEnum subclass?
-                bases = [ast.unparse(b) for b in node.bases]
-                if any("StrEnum" in b for b in bases):
+                # Is it a StrEnum subclass? Use exact base-name match, not substring,
+                # to avoid false positives on names like MyStrEnumMixin.
+                bases = {ast.unparse(b) for b in node.bases}
+                if "StrEnum" in bases:
                     offenders.append(f"{py_file}:{node.lineno} defines {node.name}(StrEnum)")
 
     assert not offenders, (
@@ -112,9 +113,16 @@ def test_registered_packs_implement_base() -> None:
 
 
 def test_all_pack_subclasses_are_registered() -> None:
-    """Every Base* subclass under src/sinan/packs/ must be in PACK_REGISTRY."""
+    """Every Base* subclass under src/sinan/packs/ must be in PACK_REGISTRY.
+
+    PACK_REGISTRY keys are stable identifiers (e.g. "python", "dbt"), NOT class
+    names — so we check the class appears as a registry *value*, not that its
+    name is a key.
+    """
     if not PACKS_DIR.is_dir():
         pytest.skip("packs/ directory does not exist yet")
+
+    registered_classes = set(PACK_REGISTRY.values())
 
     for py_file in _iter_python_files(PACKS_DIR):
         if py_file.name == "__init__.py":
@@ -129,12 +137,19 @@ def test_all_pack_subclasses_are_registered() -> None:
                 "BaseFrameworkPack",
                 "BaseSourceIngestor",
             }
-            if pack_bases & bases and node.name not in PACK_REGISTRY:
-                msg = (
-                    f"{py_file}:{node.lineno} class {node.name} subclasses a pack base "
-                    f"but is not registered in PACK_REGISTRY"
-                )
-                raise AssertionError(msg)
+            if pack_bases & bases:
+                # The class must be registered. We can't resolve the AST ClassDef
+                # to a runtime object here, so we check by class name against the
+                # registered classes' __name__. This is a heuristic but sufficient
+                # for the gate; test_registered_packs_implement_base does the
+                # precise runtime check.
+                registered_names = {cls.__name__ for cls in registered_classes}
+                if node.name not in registered_names:
+                    msg = (
+                        f"{py_file}:{node.lineno} class {node.name} subclasses a pack base "
+                        f"but is not registered in PACK_REGISTRY"
+                    )
+                    raise AssertionError(msg)
 
 
 # ---------------------------------------------------------------------------
