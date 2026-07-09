@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg
+build/
+dist/
+
+# uv
+# uv.lock is COMMITTED (needed for --frozen in CI)
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# sinan runtime data (not committed)
+data/
+sinan_data/
+*.arcadedb/
+dump.rdb
+
+# Angular frontend (reserved — when scaffolded)
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/

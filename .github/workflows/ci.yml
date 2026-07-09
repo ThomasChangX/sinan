@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Only run test/audit when relevant files changed.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v4.0.2
+        id: filter
+        with:
+          filters:
+            code:
+              - 'src/**'
+              - 'tests/**'
+              - 'pyproject.toml'
+              - 'uv.lock'
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --extra dev
+      - run: uv run ruff check src/
+      - run: uv run ruff format --check src/
+      - run: uv run mypy src/sinan
+
+  test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --extra dev
+      - run: uv run pytest tests/ -v -m "not network" -p no:unraisableexception
+
+  # Supply-chain scan (ADR-0020). Scans uv.lock — effective from day 1 since
+  # the lockfile exists regardless of code changes.
+  audit:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v8.3.2
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      - run: uv sync --frozen --extra dev
+      - run: uv run pip-audit
+
+  # The authoritative gate — branch protection requires this to pass.
+  # Green only if all required jobs passed (or were legitimately skipped).
+  check:
+    if: always()
+    needs: [lint, test, audit]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report status
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
+          allowed-skips: test, audit

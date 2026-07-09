@@ -47,8 +47,8 @@ All run in pre-commit hooks and CI. No merge without clean lint/types.
 
 ### 5. AGENTS.md / contribution guardrails
 
-- A root `AGENTS.md` documents the architecture rules, pack interfaces, and conformance requirements — so that AI coding agents (ZCode, Codex, etc.) that help build packs follow the same constraints as human contributors.
-- Pack authoring guide (`docs/pack-authoring.md`) with a template and checklist for adding a new language/framework pack.
+- A root `AGENTS.md` documents the architecture rules, pack interfaces, and conformance requirements — so that AI coding agents (ZCode, Codex, etc.) that help build packs follow the same constraints as human contributors. The pack authoring rules (register in PACK_REGISTRY, implement correct base, emit Pydantic instances, pass conformance) live in AGENTS.md §"Pack 编写规则".
+- A dedicated pack authoring guide with a template and checklist will be added (as a `docs/` file) when the first real pack is built; until then AGENTS.md is the canonical reference.
 
 ### 6. Continuous consistency checks
 
