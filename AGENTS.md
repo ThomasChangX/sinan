@@ -107,10 +107,19 @@ ADR 引用的文件路径/类名/枚举标识符必须与代码同步。
 - **Conventional Commits** 带模块 scope: `feat(language-ts):`, `fix(query):`, `docs(adr):`, `test(types):`
 - 从 `main` 开分支
 - PR 必须通过 CI `check` 关卡
+- **处理 PR review / CI 失败**: 遵循 [`docs/agent/pr-review-protocol.md`](docs/agent/pr-review-protocol.md)（先本地验证 → 批量收集 → 修复+回复+resolve → 先修阻断性基础设施）
 
 ## 预留（未启用）
 
-以下能力在对应代码落地时启用，**现在不配置**（避免死配置）:
+以下能力在对应代码落地时启用，**现在不配置**（避免死配置/死文档）:
+
+**配置类:**
 - **前端 lint**（ESLint/Prettier）— Angular 脚手架建立后
 - **生成产物漂移检查**（generated-schema drift）— MCP/OpenAPI schema 生成器建立后
-- **Schemathesis 契约测试** — API 层建立后（参考 a-stock-assistant 的 `check-generated` 模式）
+- **Schemathesis 契约测试** — API 层建立后
+
+**文档类（`docs/agent/` 下，随代码建立）:**
+- `conventions.md` — 错误层级、API 路由约定、配置双层、数据源降级（代码建立后）
+- `pack-authoring.md` — Pack 编写完整指南与模板（首 pack 建立时，ADR-0015 §5 已计划）
+
+> 已覆盖、无需单独文档: 类型清单（NodeType/EdgeType 见 `core/types.py` + 铁律 #1/#2，非独立 enums.md）。
