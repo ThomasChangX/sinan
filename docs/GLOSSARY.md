@@ -2,6 +2,22 @@
 
 Working definitions for terms used in this project. Updated as the design solidifies.
 
+## Engineering Priorities (project-wide principle)
+
+When trade-offs arise, the priority order is:
+1. **Quality (质量)** — correctness, precision, evidence-backed, honest labeling, robustness.
+2. **Maintainability (维护性)** — clarity, extensibility, pack architecture, ADR consistency.
+3. **Cost (成本)** — dev time, compute, tokens, effort.
+
+Cost optimizations are pursued within the quality/maintainability constraint, never by sacrificing them. See ADR-0019.
+
+## Universal Actions (on every node in every view)
+
+1. **Drilldown** — click node → expand next layer (progressive disclosure).
+2. **Ask AI about this** — select → jump to AI chat with selection as context.
+3. **Show impact** — select → graph-traverse downstream dependents → blast-radius subgraph.
+4. **Trace path** — select start + end → shortest/all paths → highlighted path subgraph.
+
 ## Core Concepts
 
 - **Analysis Project (项目)** — The primary isolation boundary. A logical container holding a set of data sources and the knowledge base built from them. Projects are fully isolated from one another (no cross-project links unless explicitly configured). A project corresponds to one "thing being understood" — e.g. a product, a platform, or a collection of related repos.
